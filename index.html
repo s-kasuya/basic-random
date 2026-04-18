@@ -504,7 +504,7 @@ document.getElementById('gachaBtn').addEventListener('click', function() {
     header.innerHTML = '<span class="num">(' + (i+1) + ')</span>'
       + '<span class="src-badge ' + p.source + '">' + (p.source==='IA'?'数 I·A':p.source==='IIBC'?'数 II·B·C':'数 III·C') + '</span>'
       + '<span class="unit-tag">' + p.unit + '</span>'
-      + '<span class="prob-id">問' + p.id + '</span>';
+      + '<span class="prob-id">例題' + p.id + '</span>';
 
     var bodyEl = document.createElement('div');
     bodyEl.className = 'body-tex';
