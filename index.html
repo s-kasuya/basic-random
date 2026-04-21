@@ -255,17 +255,7 @@ var activeSources = new Set(['IA','IIBC','IIIC']);
 var activeUnits   = new Set(ALL_UNITS);
 
 var unitGrid = document.getElementById('unitGrid');
-ALL_UNITS.forEach(function(u) {
-  var btn = document.createElement('button');
-  btn.className = 'unit-btn active';
-  btn.textContent = u; btn.dataset.unit = u;
-  btn.addEventListener('click', function() {
-    if (activeUnits.has(u)) { activeUnits.delete(u); btn.classList.remove('active'); }
-    else { activeUnits.add(u); btn.classList.add('active'); }
-    updateUI();
-  });
-  unitGrid.appendChild(btn);
-});
+
 
 document.querySelectorAll('.src-tab').forEach(function(tab) {
   tab.addEventListener('click', function() {
@@ -294,17 +284,43 @@ function clearAllUnits() {
   document.querySelectorAll('.unit-btn:not(.disabled-unit)').forEach(function(btn) {
     activeUnits.delete(btn.dataset.unit); btn.classList.remove('active');
   });
-  var slider = document.getElementById('countSlider');
-  var countValEl = document.getElementById('countVal');
-  if (slider) { slider.value = 5; }
-  if (countValEl) { countValEl.textContent = '5'; }
   updateUI();
 }
+
+
+
 
 var slider = document.getElementById('countSlider');
 var countValEl = document.getElementById('countVal');
 slider.addEventListener('input', function() { countValEl.textContent = slider.value; updateUI(); });
 
+ALL_UNITS.forEach(function(u) {
+  var btn = document.createElement('button');
+  btn.className = 'unit-btn active';
+  btn.textContent = u; btn.dataset.unit = u;
+  btn.addEventListener('click', function() {
+    if (activeUnits.has(u)) {
+      activeUnits.delete(u); btn.classList.remove('active');
+      updateUI();
+    } else {
+      var wasEmpty = getPool().length === 0;
+      activeUnits.add(u); btn.classList.add('active');
+      updateUI();
+      // updateUI後にセット（updateUI内でslider.valueが上書きされるのを防ぐ）
+      if (wasEmpty) {
+        var target = Math.min(5, parseInt(slider.max));
+        slider.value = target;
+        countValEl.textContent = String(target);
+        var pool2 = getPool();
+        var gBtn = document.getElementById('gachaBtn');
+        if (gBtn && pool2.length > 0) {
+          gBtn.textContent = 'ガチャを回す（' + pool2.length + '問から' + target + '問出題）';
+        }
+      }
+    }
+  });
+  unitGrid.appendChild(btn);
+});
 function getPool() {
   return ALL_PROBLEMS.filter(function(p) {
     return activeSources.has(p.source) && activeUnits.has(p.unit);
